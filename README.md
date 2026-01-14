@@ -1,17 +1,31 @@
 # Unstructured Document Viewer ![V1.0.0](https://img.shields.io/badge/Version-1.0.0-333.svg?labelColor=eee) ![MIT License](https://img.shields.io/badge/License-MIT-333.svg?labelColor=eee)
 
-**Unstructured Document Viewer** is an extension of [RAG Document Viewer](https://github.com/preprocess-co/rag-document-viewer) that provides native support for [Unstructured.io](https://unstructured.io/) element format.
+**Unstructured Document Viewer** is an open-source library that provides interactive answer references and source grounding for RAG applications that use [Unstructured](https://unstructured.io/) for file preprocessing.
 
-It automatically converts Unstructured's pixel-based coordinates to the ratio-based bounding box format required by the viewer, allowing you to generate interactive HTML previews directly from Unstructured API responses.
+It converts PDF files into a high-fidelity, HTML-based viewer. Using element coordinates provided by Unstructured, it delivers desktop-like document viewing capabilities:
+- Preserves the exact look and feel of the original document, similar to a native file viewer
+- Highlights and lets users navigate text chunks to support citations and references in your RAG application
+
+The library generates an HTML component that can be easily embedded into web applications, desktop apps, or any system that supports HTML rendering.
 
 *Developed by [Preprocess Team](https://preprocess.co)*
 
-## Features
+**Unstructured Document Viewer** is an extension of [RAG Document Viewer](https://github.com/preprocess-co/rag-document-viewer) that provides native support for [Unstructured.io](https://unstructured.io/) element format.
 
-- **Native Unstructured Support**: Pass Unstructured elements directly without manual coordinate conversion
-- **Automatic Coordinate Transformation**: Converts pixel-based coordinates to ratio format internally
-- **Chunk Grouping**: Group multiple elements into single chunks using element IDs
-- **Inherits All RAG Document Viewer Features**: Highlighting, navigation, zoom controls, and more
+## How it works
+-   Pass in a PDF file, Unstructured element and a destination path.
+-   An HTML bundle is created.
+-   You can now embed the viewer in your application, as simple as using an `<iframe>`. Files are served directly from *your* backend under *your* auth logic, no external servers.
+
+**Viewer features:**
+
+
+![RAG Document Viewer Demo](previewer.png)
+
+1.  **Chunks Highlighting** - Visual emphasis of the important content part you want to highlight.
+2.  **Chunk Navigator**: Navigate between highlighted chunks with next/previous controls.
+3.  **Zoom Controls**: Renders the document at the optimal zoom level, and users can zoom in/out as needed.
+4.  **Scrollbar Navigator**: Visual indicators on the scrollbar show highlighted chunk positions; click to jump to a specific chunk.
 
 ---
 
@@ -68,7 +82,7 @@ Unstructured_DV(
 
 ## Usage
 
-### Basic Usage (Auto-chunking)
+### Basic Chunking Highlight (element level)
 
 Each element with valid coordinates becomes its own chunk. You can pass either `partition()` output directly or a list of element dictionaries:
 
@@ -85,7 +99,7 @@ Unstructured_DV(
 )
 ```
 
-### Grouped Chunks
+### Advanced Chunking Highlight (group elements into chunks)
 
 Group multiple elements into single chunks using element IDs:
 
@@ -133,39 +147,6 @@ All styling options from RAG Document Viewer are supported:
 | `page_number` | `bool` | `True` | Display page numbers |
 
 See [RAG Document Viewer documentation](https://github.com/preprocess-co/rag-document-viewer#viewer-options) for all options.
-
----
-
-## Coordinate Transformation
-
-Unstructured uses pixel-based coordinates with four corner points (counter-clockwise from top-left):
-
-```python
-{
-    "coordinates": {
-        "points": [
-            [x1, y1],  # top-left
-            [x1, y2],  # bottom-left
-            [x2, y2],  # bottom-right
-            [x2, y1]   # top-right
-        ],
-        "layout_width": 1700,
-        "layout_height": 2200
-    }
-}
-```
-
-This is automatically converted to ratio format:
-
-```python
-{
-    "page": 1,
-    "top": y1 / layout_height,
-    "left": x1 / layout_width,
-    "height": (y2 - y1) / layout_height,
-    "width": (x2 - x1) / layout_width
-}
-```
 
 ---
 
