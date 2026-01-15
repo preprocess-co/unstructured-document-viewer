@@ -30,7 +30,7 @@ class Unstructured_Document_Viewer(RAG_Document_Viewer):
         Initialise the Unstructured document viewer converter.
 
         Args:
-            filepath (str): Path to the input document file.
+            filepath (str): Path to the input PDF file (only PDF format is supported).
             distpath (str, optional): Output directory path. Defaults to input file directory.
             elements (list[dict]): Raw Unstructured API response containing element dictionaries.
                                    Each element should have 'element_id' and 'metadata' with
@@ -44,6 +44,11 @@ class Unstructured_Document_Viewer(RAG_Document_Viewer):
         """
         if elements is None:
             raise Exception("Please pass Unstructured elements to build the previewer.")
+
+        # PDF-only validation
+        filepath = Path(filepath) if not isinstance(filepath, Path) else filepath
+        if filepath.suffix.lower() != '.pdf':
+            raise ValueError(f"Only PDF files are supported. Received: {filepath.suffix}")
 
         boxes = self._convert_unstructured_to_boxes(elements, chunks)
         super().__init__(filepath, distpath, boxes, configs)
@@ -167,7 +172,7 @@ def Unstructured_DV(file_path: str = None, store_path: str = None, elements: lis
     conversion automatically.
 
     Args:
-        file_path (str): Path to the input document file.
+        file_path (str): Path to the input PDF file (only PDF format is supported).
         store_path (str, optional): Output directory path. If not provided, creates a
                                     directory named after the input file.
         elements (list): Unstructured elements - either raw partition() output (Element objects)
@@ -180,6 +185,7 @@ def Unstructured_DV(file_path: str = None, store_path: str = None, elements: lis
     Raises:
         FileNotFoundError: If the specified file_path does not exist.
         FileExistsError: If the store_path directory already exists.
+        ValueError: If the file is not a PDF.
     """
     if file_path is None:
         raise FileNotFoundError(f"[{file_path}] not exist, please check.")
@@ -192,6 +198,10 @@ def Unstructured_DV(file_path: str = None, store_path: str = None, elements: lis
     file_path = Path(file_path)
     if not file_path.exists():
         raise FileNotFoundError(f"[{file_path}] not exist, please check.")
+
+    # PDF-only validation
+    if file_path.suffix.lower() != '.pdf':
+        raise ValueError(f"Only PDF files are supported. Received: {file_path.suffix}")
 
     if store_path is None:
         store_path = Path(file_path.parent / file_path.stem)
